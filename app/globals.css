@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #120F1A; }
+::-webkit-scrollbar-thumb { background: rgba(140,123,255,0.2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(140,123,255,0.5); }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(40px, -30px) scale(1.06); }
+  66%       { transform: translate(-25px, 18px) scale(0.95); }
+}
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(1.7); }
+}
+
+.animate-fade-in-up { animation: fadeInUp 0.45s ease both; }
+.animate-fade-in    { animation: fadeIn 0.35s ease both; }
+.animate-orb        { animation: orb 14s ease-in-out infinite; }
+.animate-status     { animation: statusPulse 1.8s ease-in-out infinite; }
+
+.glass {
+  background: rgba(26, 22, 38, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(140, 123, 255, 0.1);
+  transition: border-color 0.2s ease;
+}
+.glass:hover { border-color: rgba(140, 123, 255, 0.22); }
+
+.text-cyan-gradient {
+  background: linear-gradient(135deg, #8C7BFF 0%, #6C5CE0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-grid {
+  /* Two soft, static radial blobs (violet + warm amber) sit beneath the
+     grid lines — a gentle wash rather than a flat fill. Kept low-opacity
+     and unanimated here so it reads as ambient texture, not a focal point;
+     motion is reserved for the auth-screen orbs layered on top of this. */
+  background-image:
+    radial-gradient(circle at 14% 10%, rgba(140, 123, 255, 0.11) 0%, transparent 44%),
+    radial-gradient(circle at 88% 92%, rgba(240, 168, 104, 0.06) 0%, transparent 50%),
+    linear-gradient(rgba(140, 123, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 123, 255, 0.03) 1px, transparent 1px);
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  background-size: auto, auto, 40px 40px, 40px 40px;
+}
+
+.input-field {
+  background: rgba(18, 15, 26, 0.9);
+  border: 1px solid rgba(140, 123, 255, 0.12);
+  color: #E2E8F0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field:focus {
+  outline: none;
+  border-color: rgba(140, 123, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(140, 123, 255, 0.07);
+}
+.input-field::placeholder { color: #2D3748; }
+
+.btn-primary {
+  background: linear-gradient(135deg, #5B4BC4 0%, #8C7BFF 50%, #5B4BC4 100%);
+  background-size: 200% auto;
+  transition: background-position 0.4s ease, box-shadow 0.2s, transform 0.1s;
+  color: #120F1A;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background-position: right center;
+  box-shadow: 0 0 24px rgba(140, 123, 255, 0.35);
+}
+.btn-primary:active  { transform: scale(0.98); }
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
