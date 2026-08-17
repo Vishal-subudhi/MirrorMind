@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mirrormind-pocketbase
+    runtime: docker
+    dockerfilePath: ./pocketbase/Dockerfile
+    dockerContext: ./pocketbase
+    plan: free
+    envVars:
+      - key: PB_ADMIN_EMAIL
+        sync: false
+      - key: PB_ADMIN_PASSWORD
+        sync: false
