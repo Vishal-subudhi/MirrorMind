@@ -33,7 +33,7 @@ export default function MainPanel() {
         user_id: user.id,
         job_description: jobDescription,
         title: jobDescription.slice(0, 60),
-      })
+      }, { requestKey: null })
 
       const createdQuestions = []
       for (const q of generatedQuestions) {
@@ -53,7 +53,7 @@ export default function MainPanel() {
       setShowModal(false)
       setJobDescription('')
     } catch (err) {
-      setError('Failed to generate questions. Check your API key and try again.')
+      setError(err?.message || 'Failed to generate questions. Check your API key and try again.')
     } finally {
       setLoading(false)
     }
