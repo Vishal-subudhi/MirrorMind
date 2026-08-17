@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import useMirrorMindStore from '@/store/mirrorMindStore'
 import QuestionCard from '@/components/main/QuestionCard'
+import { createClient } from '@/lib/pocketbase/client'
 
 export default function MainPanel() {
   const { currentSessionId, questions, scores, setCurrentSession, clearSession } = useMirrorMindStore()
@@ -22,9 +23,33 @@ export default function MainPanel() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ job_description: jobDescription, question_count: questionCount }),
       })
-      const { session, questions: generatedQuestions, error: apiError } = await res.json()
+      const { questions: generatedQuestions, error: apiError } = await res.json()
       if (apiError) throw new Error(apiError)
-      setCurrentSession(session.id, jobDescription, generatedQuestions)
+
+      const pb = createClient()
+      const user = pb.authStore.record
+
+      const sessionRecord = await pb.collection('sessions').create({
+        user_id: user.id,
+        job_description: jobDescription,
+        title: jobDescription.slice(0, 60),
+      })
+
+      const createdQuestions = []
+      for (const q of generatedQuestions) {
+        const questionRecord = await pb.collection('questions').create({
+          session_id: sessionRecord.id,
+          question_text: q.question_text,
+          order_index: q.order_index,
+        }, { requestKey: null })
+        createdQuestions.push({
+          id: questionRecord.id,
+          question_text: questionRecord.question_text,
+          order_index: questionRecord.order_index,
+        })
+      }
+
+      setCurrentSession(sessionRecord.id, jobDescription, createdQuestions)
       setShowModal(false)
       setJobDescription('')
     } catch (err) {
