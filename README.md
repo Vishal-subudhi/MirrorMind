@@ -17,7 +17,7 @@ A voice-based interview preparation tool that generates role-specific questions 
 
 ## Tech Stack
 - Next.js (App Router)
-- OpenAI GPT-4 (question generation + answer evaluation)
+- NVIDIA (question generation + answer evaluation)
 - Whisper API (speech-to-text transcription)
 - PocketBase (backend database — self-hosted on Render)
 - MediaRecorder API (browser microphone recording)
