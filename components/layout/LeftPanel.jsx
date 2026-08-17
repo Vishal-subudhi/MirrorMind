@@ -1,39 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/pocketbase/client'
+import { ensureAuth } from '@/lib/pocketbase/client'
 
 export default function LeftPanel() {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading]   = useState(true)
-  const [userEmail, setUserEmail] = useState('')
-  const router = useRouter()
 
   useEffect(() => {
-    const pb = createClient()
-    const user = pb.authStore.record
-    if (!user) {
-      setLoading(false)
-      return
-    }
-    setUserEmail(user.email)
-    pb.collection('sessions')
-      .getFullList({
-        filter: pb.filter('user_id = {:userId}', { userId: user.id }),
+    ensureAuth()
+      .then(pb => pb.collection('sessions').getFullList({
+        filter: pb.filter('user_id = {:userId}', { userId: pb.authStore.record.id }),
         sort: '-created',
         requestKey: null,
-      })
+      }))
       .then(setSessions)
       .catch(() => setSessions([]))
       .finally(() => setLoading(false))
   }, [])
-
-  function handleSignOut() {
-    const pb = createClient()
-    pb.authStore.clear()
-    router.push('/login')
-  }
 
   return (
     <aside
@@ -83,17 +67,6 @@ export default function LeftPanel() {
           </div>
         )}
       </div>
-      {userEmail && (
-        <div className="px-5 py-4" style={{ borderTop: '1px solid #00D4FF0F' }}>
-          <p className="text-[10px] text-[#3D5166] truncate mb-2">{userEmail}</p>
-          <button
-            onClick={handleSignOut}
-            className="text-[10px] text-[#3D5166] hover:text-[#00D4FF] transition-colors"
-          >
-            Sign out
-          </button>
-        </div>
-      )}
     </aside>
   )
 }

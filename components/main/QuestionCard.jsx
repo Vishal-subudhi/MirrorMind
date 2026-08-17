@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import useMirrorMindStore from '@/store/mirrorMindStore'
-import { createClient } from '@/lib/pocketbase/client'
+import { ensureAuth } from '@/lib/pocketbase/client'
 
 export default function QuestionCard({ question, index }) {
   const [isOpen, setIsOpen]           = useState(false)
@@ -70,8 +70,8 @@ export default function QuestionCard({ question, index }) {
       const data = await res.json()
       setFeedback(data)
 
-      const pb = createClient()
       try {
+        const pb = await ensureAuth()
         await pb.collection('answers').create({
           question_id: question.id,
           session_id: currentSessionId,

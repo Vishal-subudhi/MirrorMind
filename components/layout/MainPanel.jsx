@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import useMirrorMindStore from '@/store/mirrorMindStore'
 import QuestionCard from '@/components/main/QuestionCard'
-import { createClient } from '@/lib/pocketbase/client'
+import { ensureAuth } from '@/lib/pocketbase/client'
 
 export default function MainPanel() {
   const { currentSessionId, questions, scores, setCurrentSession, clearSession } = useMirrorMindStore()
@@ -26,7 +26,7 @@ export default function MainPanel() {
       const { questions: generatedQuestions, error: apiError } = await res.json()
       if (apiError) throw new Error(apiError)
 
-      const pb = createClient()
+      const pb = await ensureAuth()
       const user = pb.authStore.record
 
       const sessionRecord = await pb.collection('sessions').create({
