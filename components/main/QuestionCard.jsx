@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import useMirrorMindStore from '@/store/mirrorMindStore'
+import { createClient } from '@/lib/pocketbase/client'
 
 export default function QuestionCard({ question, index }) {
   const [isOpen, setIsOpen]           = useState(false)
@@ -10,8 +11,9 @@ export default function QuestionCard({ question, index }) {
   const [feedback, setFeedback]       = useState(null)
   const [loading, setLoading]         = useState(false)
   const [copied, setCopied]           = useState(false)
+  const [error, setError]             = useState('')
   const recognitionRef                = useRef(null)
-  const { addScore }                  = useMirrorMindStore()
+  const { addScore, currentSessionId } = useMirrorMindStore()
 
   function startRecording() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -54,6 +56,7 @@ export default function QuestionCard({ question, index }) {
 
   async function evaluateAnswer() {
     setLoading(true)
+    setError('')
     try {
       const res = await fetch('/api/evaluate-answer', {
         method:  'POST',
@@ -66,6 +69,21 @@ export default function QuestionCard({ question, index }) {
       })
       const data = await res.json()
       setFeedback(data)
+
+      const pb = createClient()
+      try {
+        await pb.collection('answers').create({
+          question_id: question.id,
+          session_id: currentSessionId,
+          transcript,
+          score: data.score,
+          feedback: data.feedback,
+          tip: data.tip,
+        }, { requestKey: null })
+      } catch (err) {
+        setError(err?.message || 'Failed to save your answer.')
+      }
+
       addScore(question.id, data.score)
     } catch (err) {
       console.error(err)
@@ -168,6 +186,14 @@ export default function QuestionCard({ question, index }) {
             <div className="mt-3 flex items-center gap-2 text-xs text-[#3D5166]">
               <span className="w-3 h-3 border border-[#00D4FF] border-t-transparent rounded-full animate-spin flex-shrink-0" />
               Evaluating your answer...
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-3 flex items-start gap-2 px-3 py-2 rounded-lg"
+              style={{ background: '#EF444410', border: '1px solid #EF444430' }}>
+              <span className="text-red-400 text-xs">⚠</span>
+              <p className="text-red-400 text-xs">{error}</p>
             </div>
           )}
 
