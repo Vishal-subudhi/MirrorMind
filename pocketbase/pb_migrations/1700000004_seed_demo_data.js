@@ -1,7 +1,12 @@
 // mirrormind/pocketbase/pb_migrations/1700000004_seed_demo_data.js
 migrate((app) => {
   const usersCollection = app.findCollectionByNameOrId("users")
-  let demoUser = app.findAuthRecordByEmail("users", "demo@mirrormind.app")
+  let demoUser = null
+  try {
+    demoUser = app.findAuthRecordByEmail("users", "demo@mirrormind.app")
+  } catch (e) {
+    demoUser = null
+  }
   const isNewUser = !demoUser
 
   if (isNewUser) {
@@ -86,7 +91,12 @@ migrate((app) => {
     })
   }
 }, (app) => {
-  const demoUser = app.findAuthRecordByEmail("users", "demo@mirrormind.app")
+  let demoUser = null
+  try {
+    demoUser = app.findAuthRecordByEmail("users", "demo@mirrormind.app")
+  } catch (e) {
+    demoUser = null
+  }
   if (demoUser) {
     app.delete(demoUser)
   }
